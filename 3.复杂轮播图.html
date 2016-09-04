@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <style type="text/css">
+        * {
+            padding: 0;
+            margin: 0;
+            list-style: none;
+            border: 0;
+        }
+
+        .all {
+            width: 500px;
+            height: 200px;
+            padding: 7px;
+            border: 1px solid #ccc;
+            margin: 100px auto;
+            position: relative;
+        }
+
+        .screen {
+            width: 500px;
+            height: 200px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .screen li {
+            width: 500px;
+            height: 200px;
+            overflow: hidden;
+            float: left;
+        }
+
+        .screen ul {
+            position: absolute;
+            left: 0;
+            top: 0px;
+            width: 3000px;
+        }
+
+        .all ol {
+            position: absolute;
+            right: 10px;
+            bottom: 10px;
+            line-height: 20px;
+            text-align: center;
+        }
+
+        .all ol li {
+            float: left;
+            width: 20px;
+            height: 20px;
+            background: #fff;
+            border: 1px solid #ccc;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+
+        .all ol li.current {
+            background: yellow;
+        }
+
+        #arr {
+            display: none;
+        }
+
+        #arr span {
+            width: 40px;
+            height: 40px;
+            position: absolute;
+            left: 5px;
+            top: 50%;
+            margin-top: -20px;
+            background: #000;
+            cursor: pointer;
+            line-height: 40px;
+            text-align: center;
+            font-weight: bold;
+            font-family: '黑体';
+            font-size: 30px;
+            color: #fff;
+            opacity: 0.3;
+            border: 1px solid #fff;
+        }
+
+        #arr #right {
+            right: 5px;
+            left: auto;
+        }
+    </style>
+</head>
+<body>
+<div class="all" id='box'>
+    <div class="screen">
+        <ul>
+            <li><img src="images/wf1.jpg" width="500" height="200"/></li>
+            <li><img src="images/wf2.jpg" width="500" height="200"/></li>
+            <li><img src="images/wf3.jpg" width="500" height="200"/></li>
+            <li><img src="images/wf4.jpg" width="500" height="200"/></li>
+            <li><img src="images/wf5.jpg" width="500" height="200"/></li>
+        </ul>
+        <ol>
+        </ol>
+    </div>
+    <div id="arr"><span id="left">&lt;</span><span id="right">&gt;</span></div>
+</div>
+<!--1.引包-->
+<script src="../common.js"></script>
+<script src="animate.js"></script>
+<!--2.编写JS-->
+<script>
+    //准备元素
+    var box = my$("box");
+    var screen = box.children[0];
+    var arr = box.children[1];
+    var ul = screen.children[0];
+    var ol = screen.children[1];
+    var arrLeft = arr.children[0];
+    var arrRight = arr.children[1];
+    //图片的宽度
+    var imgWidth = screen.offsetWidth;
+    //点击箭头记录图片
+    var index = 0;
+    //点击序号记录图片
+    var olIndex = 0;
+    //1.动态创建列表
+    //图片的张数
+    var count = ul.children.length;
+    //for循环得到每一li
+    for (var i = 0; i < count; i++) {
+        //动态创建li
+        var li = document.createElement("li");
+        //追加到ol
+        ol.appendChild(li);
+        li.innerText = i + 1;
+    }
+    //让第一个高亮显示
+    ol.children[0].className = "current";
+
+    //2.点击序号的时候，可以切换图片
+    //for循环得到每一个li,注册点击事件
+    for (var i = 0; i < ol.children.length; i++) {
+        var li = ol.children[i];
+        //li点击对应的图片记录下来
+        li.index = i;
+        //注册点击事件
+        li.onclick = function () {
+            //for循环得到所有的li,将所有的li都变为初始化
+            for (var i = 0; i < ol.children.length; i++) {
+                var li = ol.children[i];
+                li.className = "class";
+            }
+            //当前的为高亮显示
+            this.style.background = "yellow";
+            //设置图片的位置
+            animate(ul, -this.index * imgWidth);
+            //点击序号时候，让索引同步
+            index = olIndex = this.index;
+        };
+    }
+    ;
+
+    //3.鼠标放到盒子上，arr显示，鼠标离开，arr隐藏；
+    box.onmouseover = function () {
+        arr.style.display = "block";
+        //停止定时器
+        clearInterval(timerId);
+    };
+    box.onmouseout = function () {
+        arr.style.display = "none";
+        //启用定时器
+        timerId = setInterval(function () {
+            //直接调用向右点击的时候
+            arrRight.click();
+        }, 3000);
+    };
+    //3.1点击箭头的时候，切换图片
+    //下一张
+    arrRight.onclick = function () {
+        //当鼠标右键点击的时候，点击到最后一张，将他的索引变为0，偷偷换到第一张
+        if (index == count) {
+            index = 0;
+            ul.style.left = "0px";
+        }
+        //累加
+        index++;
+        //图片的位置
+        animate(ul, -index * imgWidth);
+        //6.2判断，当olIndex<count-1时候，就++
+        if (olIndex < count - 1){
+            olIndex++;
+        }else{
+            //最后一张就为0
+            olIndex = 0;
+        }
+
+        //清楚li的高亮显示
+        for (var i = 0; i < ol.children.length; i++) {
+            var li = ol.children[i];
+            li.removeAttribute("class");
+        }
+        ;
+        //让当前的li高亮显示
+        ol.children[olIndex].className = "current";
+    };
+    //上一张
+    arrLeft.onclick = function () {
+        //左键，当鼠标点击到第一张的时候，偷偷将索引换到最后一张（克隆的那张）
+        if (index == 0) {
+            index = count;
+            animate(ul, -index * imgWidth);
+        }
+        index--;
+        //设置盒子的位置
+        animate(ul, -index * imgWidth);
+        //6.3如果olIndex>0,就--
+        if (olIndex > 0) {
+            olIndex--;
+        } else {
+            //如果是第一张，就换成倒数第二张
+            olIndex = count - 1;
+        }
+        //清楚li的高亮显示
+        for (var i = 0; i < ol.children.length; i++) {
+            var li = ol.children[i];
+            li.removeAttribute("class");
+        }
+        ;
+        //让当前的li高亮显示
+        ol.children[olIndex].className = "current";
+    }
+    //4.无缝滚动
+    //将第一张克隆一份，放到最后一张，当鼠标右键点击的时候，点击到最后一张，将他的索引变为0，偷偷换到第一张（真实的那张）；当鼠标点击到第一张的时候，偷偷将索引换到最后一张（克隆的那张）
+    var firstLi = ul.children[0];
+    var cloneLi = firstLi.cloneNode(true);
+    //追加到ul
+    ul.appendChild(cloneLi);
+    //5.自动播放(往右自动播放一张，相当于是鼠标向右点击一次),鼠标放上去的时候，停止定时器，鼠标离开就启用定时器
+    var timerId = setInterval(function () {
+        //直接调用向右点击的时候
+        arrRight.click();
+    }, 3000);
+
+    //6.切换图片的时候，改变序号，点击ol中的li时候，切换图片,先定义一个索引记录每一次点击的图片,当鼠标向右移动的时候索引自增;
+    //7.解决索引不同步问题切换图片的时候，之后在点击下一张不同步的问题
+
+
+</script>
+</body>
+</html>

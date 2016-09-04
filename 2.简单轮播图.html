@@ -1,0 +1,178 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <style>
+        body, ul, ol, li, img {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        #box {
+            /* 不允许选中 */
+            -webkit-user-select:none;
+            -moz-user-select:none;
+            -ms-user-select:none;
+            user-select:none;
+
+            width: 490px;
+            height: 270px;
+            padding: 5px;
+            position: relative;
+            border: 1px solid #ccc;
+            margin: 100px auto 0;
+        }
+
+        .ad {
+            width: 490px;
+            height: 270px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        #box img {
+            width: 490px;
+        }
+
+        .ad ol {
+            position: absolute;
+            right: 10px;
+            bottom: 10px;
+        }
+
+        .ad ol li {
+            width: 20px;
+            height: 20px;
+            line-height: 20px;
+            border: 1px solid #ccc;
+            text-align: center;
+            background: #fff;
+            float: left;
+            margin-right: 10px;
+            cursor: pointer;
+            _display: inline;
+        }
+
+        .ad ol li.current {
+            background: yellow;
+        }
+
+        .ad ul li {
+            float: left;
+        }
+
+        .ad ul {
+            position: absolute;
+            top: 0;
+            width: 2940px;
+        }
+
+        .ad ul li.current {
+            display: block;
+        }
+
+        #arr {
+            display: none;
+        }
+
+        #arr span {
+            width: 40px;
+            height: 40px;
+            position: absolute;
+            left: 5px;
+            top: 50%;
+            margin-top: -20px;
+            background: #000;
+            cursor: pointer;
+            line-height: 40px;
+            text-align: center;
+            font-weight: bold;
+            font-family: '黑体';
+            font-size: 30px;
+            color: #fff;
+            opacity: 0.3;
+            border: 1px solid #fff;
+        }
+
+        #arr #right {
+            right: 5px;
+            left: auto;
+        }
+    </style>
+</head>
+<body>
+<div id="box" class="all">
+    <div class="ad">
+        <ul>
+            <li><img src="images/1.jpg"/></li>
+            <li><img src="images/2.jpg"/></li>
+            <li><img src="images/3.jpg"/></li>
+            <li><img src="images/4.jpg"/></li>
+            <li><img src="images/5.jpg"/></li>
+        </ul>
+    </div>
+    <div id="arr"><span >&lt;</span><span id="right">&gt;</span></div>
+</div>
+<!--1.引入JS-->
+<script src="../common.js"></script>
+<script src="animate.js"></script>
+<!--2.编写JS-->
+<script>
+    //准备元素
+    var box = document.getElementById("box");
+    var ad = box.children[0];
+    var arr = box.children[1];
+    var arrLeft = arr.children[0];
+    var arrRight = arr.children[1];
+    var ul = ad.children[0];
+    //图片的宽度
+    var imgWidth = ad.offsetWidth;
+    //1.鼠标放上去，arr显示，鼠标离开，arr隐藏
+    box.onmouseover= function () {
+        //arr显示
+        arr.style.display = "block";
+    };
+    box.onmouseout= function () {
+        //arr显示
+        arr.style.display = "none";
+    };
+    //点击右键的时候，图片跳到下一张
+    var index = 0;
+    //用索引记录对应的每一张图片
+    //图片的张数
+    var count = ul.children.length;
+    arrRight.onclick= function () {
+        if(index < count-1){
+            //累加
+            index++;
+            //设置图片的位置
+            animate(ul,-index*imgWidth);
+        }else{
+            index = 0;
+            animate(ul,-index*imgWidth);
+        }
+
+    }
+    arrLeft.onclick= function () {
+        if(index >0){
+            //累加
+            index--;
+            //设置图片的位置
+            animate(ul,-index*imgWidth);
+        }
+    }
+    // //将第一张图片克隆一张放到最后
+    var firstLi = ul.children[0];
+    var cloneLi = firstLi.cloneNode(true);
+    //将图片追加到最后的
+    ul.appendChild(cloneLi);
+    //当向右点击的时候，点击到最后一张的时候，就让他的下标变为0；
+    //当向左电机的时候，点击到第一张的时候，让他的小标变为count；
+
+</script>
+</body>
+</html>
